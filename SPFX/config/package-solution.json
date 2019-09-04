@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "cross-site-approvals-client-side-solution",
+    "id": "eb743673-4cd1-439b-abc7-c8558cda0af9",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "isDomainIsolated": false
+  },
+  "paths": {
+    "zippedPackage": "solution/cross-site-approvals.sppkg"
+  }
+}
