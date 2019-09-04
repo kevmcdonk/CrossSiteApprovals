@@ -1,6 +1,6 @@
 ## cross-site-approvals
 
-This is where you include your WebPart documentation.
+Web part to show webhooks and allow the user to add them.
 
 ### Building the code
 
