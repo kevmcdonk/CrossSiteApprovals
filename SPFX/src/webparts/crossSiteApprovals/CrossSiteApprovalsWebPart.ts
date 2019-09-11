@@ -9,12 +9,24 @@ import {
 import * as strings from 'CrossSiteApprovalsWebPartStrings';
 import CrossSiteApprovals from './components/CrossSiteApprovals';
 import { ICrossSiteApprovalsProps } from './interfaces/ICrossSiteApprovalsProps';
+import pnp from "sp-pnp-js";
 
 export interface ICrossSiteApprovalsWebPartProps {
   description: string;
 }
 
 export default class CrossSiteApprovalsWebPart extends BaseClientSideWebPart<ICrossSiteApprovalsWebPartProps> {
+
+  public onInit(): Promise<void> {
+
+    return super.onInit().then(_ => {
+  
+      pnp.setup({
+        spfxContext: this.context
+      });
+  
+    });
+  }
 
   public render(): void {
     const element: React.ReactElement<ICrossSiteApprovalsProps > = React.createElement(

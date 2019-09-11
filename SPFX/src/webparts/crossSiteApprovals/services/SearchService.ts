@@ -1,7 +1,9 @@
 'use strict';
-import * as pnp from 'sp-pnp-js';
+//import * as pnp from 'sp-pnp-js';
+import pnp from "sp-pnp-js";
 import { ISearchService, ISearchResult } from '../interfaces/ICrossSiteApprovalsState';
-  
+//import { sp } from "@pnp/sp";
+
 export class SearchService implements ISearchService
 {
   
@@ -19,7 +21,7 @@ export class SearchService implements ISearchService
                    results.PrimarySearchResults.forEach((result)=>{
                     _results.push({
                         title:result.Title,
-                        url:result.Path
+                        url:result.Path 
                     });
                    });
                 })
