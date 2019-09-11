@@ -6,7 +6,6 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
-
 import * as strings from 'CrossSiteApprovalsWebPartStrings';
 import CrossSiteApprovals from './components/CrossSiteApprovals';
 import { ICrossSiteApprovalsProps } from './interfaces/ICrossSiteApprovalsProps';
@@ -22,7 +21,8 @@ export default class CrossSiteApprovalsWebPart extends BaseClientSideWebPart<ICr
       CrossSiteApprovals,
       {
         description: this.properties.description,
-        spHttpClient: this.context.spHttpClient
+        spHttpClient: this.context.spHttpClient,
+        context: this.context
       }
     );
 

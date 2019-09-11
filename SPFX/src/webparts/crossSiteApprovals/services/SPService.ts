@@ -22,7 +22,7 @@ export default class SPService  {
           },
           "resource": `${siteUrl}/_api/web/lists('${listId}')`,
           "notificationUrl": "https://143aec40.ngrok.io/api/CrossSiteApprovalsWebhook",
-          "expirationDateTime": "2019-10-27T16:17:57+00:00", //TODO: make this dynamically 6 months in the future
+          "expirationDateTime": "2019-11-27T16:17:57+00:00", //TODO: make this dynamically 6 months in the future
           "clientState": "A0A354EC-97D4-4D83-9DDB-144077ADB449"
         });
 
