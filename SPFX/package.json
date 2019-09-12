@@ -24,7 +24,8 @@
     "office-ui-fabric-react": "6.143.0",
     "react": "16.7.0",
     "react-dom": "16.7.0",
-    "sp-pnp-js": "^3.0.10"
+    "sp-pnp-js": "^3.0.10",
+    "moment": "2.18.1"
   },
   "resolutions": {
     "@types/react": "16.7.22"

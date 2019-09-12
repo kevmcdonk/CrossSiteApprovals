@@ -3,5 +3,6 @@ import { SPHttpClient } from '@microsoft/sp-http';
 export interface ICrossSiteApprovalsProps {
   description: string;
   spHttpClient: SPHttpClient;
-  context:any;//added for ListGetter
+  context: any;
+  notificationUrl:string;
 }

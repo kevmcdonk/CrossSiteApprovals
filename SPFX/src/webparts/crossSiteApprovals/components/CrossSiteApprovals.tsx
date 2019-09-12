@@ -1,11 +1,12 @@
 import * as React from 'react';
+import * as moment from 'moment';
 import styles from './CrossSiteApprovals.module.scss';
 import { ICrossSiteApprovalsProps } from '../interfaces/ICrossSiteApprovalsProps';
 import { ICrossSiteApprovalsState, ISearchResult, IDetailsListItems} from '../interfaces/ICrossSiteApprovalsState';
 //import { TextField, MaskedTextField } from 'office-ui-fabric-react/lib/TextField';
 import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { PrimaryButton, List } from 'office-ui-fabric-react';
-import SPService from '../services/SPService';
+//import SPService from '../services/SPService';
 import { SPHttpClient, SPHttpClientConfiguration, SPHttpClientResponse, ODataVersion, ISPHttpClientConfiguration } from '@microsoft/sp-http';
 import { SearchService } from '../services/SearchService';
 import ListGetter from '../services/ListGetter';
@@ -43,7 +44,7 @@ export default class CrossSiteApprovals extends React.Component<ICrossSiteApprov
         webHookSourceName: '',
         webHookSourceSiteUrl: '',
         onSiteChange: '',
-        onLibraryChange: '',
+        onLibraryChange: 'Documents',
         subscriptionId: '',
         sites: [],
         lists: [],
@@ -98,6 +99,36 @@ private _columns: IColumn[] = [
   } as IColumn*/
 ];
 
+private _createSubscription(onSiteChange: string, onLibraryChange: string) {
+
+  const restUrl = `${onSiteChange}/_api/web/lists/getbytitle('${onLibraryChange}')/subscriptions`;
+  // Do a post request to the subscriptions endpoint
+  this.props.context.spHttpClient.post(restUrl, SPHttpClient.configurations.v1, {
+    body: JSON.stringify({
+      "resource": `${onSiteChange}/_api/web/lists/getbytitle('${onLibraryChange}')`,
+      "notificationUrl": this.props.notificationUrl,
+      "expirationDateTime": moment().add(180, 'days'),
+      "clientState": "A0A354EC-97D4-4D83-9DDB-144077ADB449"
+    })
+  }).then((response: SPHttpClientResponse) => {
+    if (response.status >= 200 && response.status < 300) {
+      alert(`Subscription added on list ${onLibraryChange}`);
+      // Update the subscriptions list
+      this._getSubscriptions(onSiteChange, onLibraryChange);
+    } else {
+      // Check the error message
+      response.json().then(data => {
+        if (typeof data.error !== "undefined") {
+          alert(`ERROR:' ${data.error.message}`);
+        }
+      });
+    }
+  }).catch(err => {
+    console.log('ERROR:', err);
+    // Reset the subscription which is loading
+  });
+}
+
 private _getSubscriptions(onSiteChange: string, onLibraryChange: string) {
   const restUrl = `${onSiteChange}/_api/web/lists/getbytitle('${onLibraryChange}')/subscriptions?$select=updated,expirationDateTime,id,notificationUrl`;
   // Call the subscription API to check all webhooks subs on the list
@@ -118,10 +149,21 @@ private _deleteSubscription(onSiteChange: string, onLibraryChange: string, subsc
   this.props.context.spHttpClient.fetch(restUrl, SPHttpClient.configurations.v1, {
     method: 'DELETE'
   }).then((response: SPHttpClientResponse) => {
-    // Update the subscriptions list
-    this.viewSubscriptions();
-  }).catch(error => {
-    console.log(`ERROR: ${error}`);
+    if (response.status >= 200 && response.status < 300) {
+      // Update the subscriptions list
+      alert(`Subscription deleted: ${subscriptionId}`);
+      this._getSubscriptions(onSiteChange, onLibraryChange);
+    } else {
+      // Check the error message
+      response.json().then(data => {
+        if (typeof data.error !== "undefined") {
+          console.log('ERROR:', data.error.message);
+        }
+      });
+    }
+  }).catch(err => {
+    console.log('ERROR:', err);
+    // Reset the subscription which is loading
   });
 }
 
@@ -218,7 +260,10 @@ private _deleteSubscription(onSiteChange: string, onLibraryChange: string, subsc
   }
 
   private addWebhook() {
-    SPService.add('',this.props.spHttpClient, this.state.webHookSourceSiteUrl, this.state.webHookSourceName);
+    const siteUrl = this.state.onSiteChange;
+    const DocumentLibrary = this.state.onLibraryChange;
+    this._createSubscription(siteUrl, DocumentLibrary);
+    //SPService.add('',this.props.spHttpClient, this.state.webHookSourceSiteUrl, this.state.webHookSourceName);
   }
 
   private viewSubscriptions() {
