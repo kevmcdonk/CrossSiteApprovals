@@ -3,3 +3,17 @@
 ################################################################################
 
 /.vs/CrossSiteApprovals/v16
+/CrossSiteApprovals/.vs/CrossSiteApprovals/v16/Server/sqlite3
+/CrossSiteApprovals/.vs/CrossSiteApprovals/v16/TestStore/0/000-0000.testlog
+/CrossSiteApprovals/.vs/CrossSiteApprovals/v16/TestStore/0/testlog.manifest
+/CrossSiteApprovals/packages
+/CrossSiteApprovals/SharePoint.WebHooks.Common/bin
+/CrossSiteApprovals/SharePoint.WebHooks.Common/obj
+/CrossSiteApprovals/SharePoint.WebHooks.Common.Tests/bin/Debug
+/CrossSiteApprovals/SharePoint.WebHooks.Common.Tests/obj
+/WebHooks.Nodejs/ngrok
+/SharePoint.WebHooks.Common/obj/Debug
+/SharePoint.WebHooks.Common/bin/Debug
+/CrossSiteApprovals/.vs/CrossSiteApprovals/v16/.suo
+/CrossSiteApprovals/.vs/CrossSiteApprovals/DesignTimeBuild/.dtbcache
+/AzureFunction/CrossSiteApprovalsWebhook.cs.bak

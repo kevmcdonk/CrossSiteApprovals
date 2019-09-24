@@ -39,13 +39,41 @@
         },
         {
             "type": "func",
-            "dependsOn": "build",
-            "options": {
-                "cwd": "${workspaceFolder}/AzureFunction/bin/Debug/netcoreapp2.1"
-            },
             "command": "host start",
+            "problemMatcher": "$func-watch",
             "isBackground": true,
-            "problemMatcher": "$func-watch"
+            "dependsOn": "npm build",
+            "options": {
+                "cwd": "${workspaceFolder}/AzureFuncNodeTest"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "npm build",
+            "command": "npm run build",
+            "dependsOn": "npm install",
+            "problemMatcher": "$tsc",
+            "options": {
+                "cwd": "${workspaceFolder}/AzureFuncNodeTest"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "npm install",
+            "command": "npm install",
+            "options": {
+                "cwd": "${workspaceFolder}/AzureFuncNodeTest"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "npm prune",
+            "command": "npm prune --production",
+            "dependsOn": "npm build",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/AzureFuncNodeTest"
+            }
         }
     ]
 }

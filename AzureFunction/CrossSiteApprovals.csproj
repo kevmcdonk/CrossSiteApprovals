@@ -4,8 +4,11 @@
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.4" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.3.1" />
+    <PackageReference Include="Microsoft.Graph" Version="1.17.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.3.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.29" />
-    <PackageReference Include="SharePointPnPCoreOnline" Version="3.12.1908" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
