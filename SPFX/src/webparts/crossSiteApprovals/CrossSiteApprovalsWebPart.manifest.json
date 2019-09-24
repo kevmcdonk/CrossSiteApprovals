@@ -19,7 +19,7 @@
     "group": { "default": "Other" },
     "title": { "default": "CrossSiteApprovals" },
     "description": { "default": "Allows an admin to set up webhooks to log approvals" },
-    "officeFabricIconFontName": "Page",
+    "officeFabricIconFontName": "Handwriting",
     "properties": {
       "description": "CrossSiteApprovals"
     }

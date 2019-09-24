@@ -6,23 +6,37 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
-
 import * as strings from 'CrossSiteApprovalsWebPartStrings';
 import CrossSiteApprovals from './components/CrossSiteApprovals';
 import { ICrossSiteApprovalsProps } from './interfaces/ICrossSiteApprovalsProps';
+import pnp from "sp-pnp-js";
+import { ICrossSiteApprovalsWebpartProps } from './ICrossSiteApprovalsWebpartProps';
 
-export interface ICrossSiteApprovalsWebPartProps {
-  description: string;
-}
+//export interface ICrossSiteApprovalsWebPartProps {
+//  description: string;
+//}
 
-export default class CrossSiteApprovalsWebPart extends BaseClientSideWebPart<ICrossSiteApprovalsWebPartProps> {
+export default class CrossSiteApprovalsWebPart extends BaseClientSideWebPart<ICrossSiteApprovalsWebpartProps> {
+
+  public onInit(): Promise<void> {
+
+    return super.onInit().then(_ => {
+  
+      pnp.setup({
+        spfxContext: this.context
+      });
+  
+    });
+  }
 
   public render(): void {
     const element: React.ReactElement<ICrossSiteApprovalsProps > = React.createElement(
       CrossSiteApprovals,
       {
         description: this.properties.description,
-        spHttpClient: this.context.spHttpClient
+        spHttpClient: this.context.spHttpClient,
+        context: this.context,
+        notificationUrl: this.properties.notificationUrl || "",
       }
     );
 
@@ -50,6 +64,9 @@ export default class CrossSiteApprovalsWebPart extends BaseClientSideWebPart<ICr
               groupFields: [
                 PropertyPaneTextField('description', {
                   label: strings.DescriptionFieldLabel
+                }),
+                PropertyPaneTextField('notificationUrl', {
+                  label: 'Specify your notification URL:'
                 })
               ]
             }

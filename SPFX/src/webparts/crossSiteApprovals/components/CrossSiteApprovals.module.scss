@@ -2,16 +2,28 @@
 
 .crossSiteApprovals {
   .container {
-    max-width: 700px;
+    min-width: 280px;
     margin: 0px auto;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+    padding-left: 0px
+    //display: flex;
   }
 
   .row {
     @include ms-Grid-row;
     @include ms-fontColor-white;
     background-color: $ms-color-themeDark;
-    padding: 20px;
+    padding-top: 10px;
+    //min-height: 175px;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 10px;
+    margin-left: 0px;
+  }
+
+  .listItem {
+    max-width: 715px;
+    margin: 5px auto 5px auto;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   }
 
   .column {
@@ -22,25 +34,59 @@
     @include ms-lgPush1;
   }
 
+  .titlecontainer {
+    padding-top: 5px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+  }
   .title {
     @include ms-font-xl;
-    @include ms-fontColor-white;
+    //@include ms-fontColor-blue;
+    color: $ms-color-themeDark;
+    padding-left: 10px;
   }
 
-  .subTitle {
-    @include ms-font-l;
-    @include ms-fontColor-white;
+  .dropdowncontainer {
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
   }
 
-  .description {
-    @include ms-font-l;
-    @include ms-fontColor-white;
+  .dropdown {
+    padding-top: 5px;
+    padding-right: 0px;
+    padding-bottom: 5px;
+    padding-left: 0px;
+  }
+
+  .bottombutton {
+    margin-top: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+  }
+
+  .topbutton {
+    margin-top: 5px;
+    margin-right: 3px;
+    margin-bottom: 10px;
+    margin-left: 3px;
+  }
+
+  .buttoncontainer {
+    margin-top: 5px;
+    margin-right: 3px;
+    margin-bottom: 10px;
+    margin-left: 10px;
   }
 
   .button {
     // Our button
     text-decoration: none;
     height: 32px;
+    padding: 2px;
+    margin: 20px;
 
     // Primary Button
     min-width: 80px;
@@ -70,5 +116,12 @@
       vertical-align: top;
       display: inline-block;
     }
+  }
+
+  .ChildClass{
+    display: inline-block;
+    margin-Bottom: 10px;
+    margin-Top: 10px;
+    padding-Left: 10px;
   }
 }
