@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccounts_cpscrosssiteapp_name": {
+      "value": null
+    },
+    "vaults_Vault_CrossSiteApprovals_name": {
+      "value": null
+    },
+    "sites_CrossSiteApprovalsFunctionsDev_name": {
+      "value": null
+    },
+    "components_CPSCrossSiteApprovals_name": {
+      "value": null
+    },
+    "serverfarms_CrossSiteApprovalsFunctionsDev_name": {
+      "value": null
+    }
+  }
+}

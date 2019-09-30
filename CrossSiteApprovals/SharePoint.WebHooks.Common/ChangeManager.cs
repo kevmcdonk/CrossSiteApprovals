@@ -21,29 +21,10 @@ namespace SharePoint.WebHooks.Common
     public class ChangeManager
     {
         #region Constants and variables
-        public const string StorageQueueName = "sharepointlistwebhookevent";
         private string accessToken = null;
         #endregion
 
-        #region Async processing...add item to queue
-        /// <summary>
-        /// Add the notification message to an Azure storage queue
-        /// </summary>
-        /// <param name="storageConnectionString">Storage account connection string</param>
-        /// <param name="notification">Notification message to add</param>
-        public void AddNotificationToQueue(string storageConnectionString, NotificationModel notification)
-        {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
 
-            // Get queue... create if does not exist.
-            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-            CloudQueue queue = queueClient.GetQueueReference(ChangeManager.StorageQueueName);
-            queue.CreateIfNotExists();
-
-            // add message to the queue
-            queue.AddMessage(new CloudQueueMessage(JsonConvert.SerializeObject(notification)));
-        }
-        #endregion
 
         #region Synchronous processing of a web hook notification
         /// <summary>
