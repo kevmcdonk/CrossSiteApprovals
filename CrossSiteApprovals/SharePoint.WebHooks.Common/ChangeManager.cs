@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OfficeDevPnP.Core;
+using Microsoft.Azure.WebJobs.Host;
 
 namespace SharePoint.WebHooks.Common
 {
@@ -31,50 +32,77 @@ namespace SharePoint.WebHooks.Common
         /// Processes a received notification. This typically is triggered via an Azure Web Job that reads the Azure storage queue
         /// </summary>
         /// <param name="notification">Notification to process</param>
-        public async Task ProcessNotification(NotificationModel notification)
+        public async Task ProcessNotification(NotificationModel notification, TraceWriter log)
         {
             ClientContext cc = null;
+            ClientContext acc = null;
+            string notificationStep = "1";
             try
             {
                 #region Setup an app-only client context
                 AuthenticationManager am = new AuthenticationManager();
-
+                notificationStep = "1a";
                 string url = String.Format("https://{0}{1}", System.Environment.GetEnvironmentVariable("TenantName"), notification.SiteUrl);
+                notificationStep = "1b" + url;
                 string realm = TokenHelper.GetRealmFromTargetUrl(new Uri(url));
+
+                string approvalUrl = System.Environment.GetEnvironmentVariable("ApprovalSiteUrl");
+                log.Info("ApprovalSiteUrl: " + approvalUrl);
+                notificationStep = "1b" + url;
+                string approvalRealm = TokenHelper.GetRealmFromTargetUrl(new Uri(approvalUrl));
+                notificationStep = "1c";
                 string clientId = System.Environment.GetEnvironmentVariable("ClientId");
+                notificationStep = "1d";
                 string clientSecret = System.Environment.GetEnvironmentVariable("ClientSecret");
 
+                notificationStep = "2";
                 if (new Uri(url).DnsSafeHost.Contains("spoppe.com"))
                 {
+                    log.Info("Government cloud login (I think)");
                     cc = am.GetAppOnlyAuthenticatedContext(url, realm, clientId, clientSecret, acsHostUrl: "windows-ppe.net", globalEndPointPrefix: "login");
+                    acc = am.GetAppOnlyAuthenticatedContext(approvalUrl, approvalRealm, clientId, clientSecret, acsHostUrl: "windows-ppe.net", globalEndPointPrefix: "login");
+                    log.Info("Government cloud login (I think) token received");
                 }
                 else
                 {
+                    log.Info("App only login");
+                    notificationStep = $"2";
                     cc = am.GetAppOnlyAuthenticatedContext(url, clientId, clientSecret);
+                    acc = am.GetAppOnlyAuthenticatedContext(approvalUrl, clientId, clientSecret);
+                    log.Info("App only login token received");
                 }
-
+                notificationStep = "3";
                 cc.ExecutingWebRequest += Cc_ExecutingWebRequest;
                 #endregion
-
+                notificationStep = "3a";
                 #region Grab the list for which the web hook was triggered
                 ListCollection lists = cc.Web.Lists;
+                notificationStep = "3b";
                 Guid listId = new Guid(notification.Resource);
+                notificationStep = "3c";
+                log.Info("Loaded source list");
                 IEnumerable<List> results = cc.LoadQuery<List>(lists.Where(lst => lst.Id == listId));
+                notificationStep = $"3d-{listId.ToString()},{notification.Resource.ToString()}, {notification.SiteUrl}";
                 cc.ExecuteQueryRetry();
-                List changeList = results.FirstOrDefault();
-                if (changeList == null)
+                log.Info("Loaded source list loaded");
+                notificationStep = "3e";
+                List notificationSourceList = results.FirstOrDefault();
+                if (notificationSourceList == null)
                 {
                     // list has been deleted inbetween the event being fired and the event being processed
                     return;
                 }
+                notificationStep = "4";
                 #endregion
 
                 #region Grab the list used to write the web hook history
                 // Ensure reference to the history list, create when not available
-                List approvalsList = cc.Web.GetListByTitle("Approvals");
+                List approvalsList = acc.Web.GetListByTitle("Approvals");
+
                 if (approvalsList == null)
                 {
-                    approvalsList = cc.Web.CreateList(ListTemplateType.GenericList, "Approvals", false);
+                    log.Info("Creating approvals list as not in place");
+                    approvalsList = acc.Web.CreateList(ListTemplateType.GenericList, "Approvals", false);
                     this.AddTextField(approvalsList, "ClientState", "ClientState", cc);
                     this.AddTextField(approvalsList, "SubscriptionId", "SubscriptionId", cc);
                     this.AddTextField(approvalsList, "ExpirationDateTime", "ExpirationDateTime", cc);
@@ -87,8 +115,9 @@ namespace SharePoint.WebHooks.Common
                     this.AddTextField(approvalsList, "EditorEmail", "EditorEmail", cc);
                     this.AddTextField(approvalsList, "Activity", "Activity", cc);
                     approvalsList.Update();
-                    cc.ExecuteQuery();
+                    acc.ExecuteQuery();
                 }
+                notificationStep = "5";
                 #endregion
 
                 #region Grab the list changes and do something with them
@@ -100,7 +129,7 @@ namespace SharePoint.WebHooks.Common
                 changeQuery.RecursiveAll = true;
                 changeQuery.User = true;
                 changeQuery.FetchLimit = 1000; // Max value is 2000, default = 1000
-
+                notificationStep = "6";
                 ChangeToken lastChangeToken = null;
                 Guid id = new Guid(notification.SubscriptionId);
 
@@ -111,7 +140,7 @@ namespace SharePoint.WebHooks.Common
                 var storageAccount = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(storageConnectionString);
                 CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
                 CloudTable table = tableClient.GetTableReference(tableName);
-
+                notificationStep = "7";
                 await table.CreateIfNotExistsAsync();
                 TableResult result = await table.ExecuteAsync(TableOperation.Retrieve<TableChangeToken>("List", id.ToString()));
                 TableChangeToken loadedChangeToken = null;
@@ -121,7 +150,7 @@ namespace SharePoint.WebHooks.Common
                     loadedChangeToken = (result.Result as TableChangeToken);
                     lastChangeToken.StringValue = loadedChangeToken.StringValue;
                 }
-
+                notificationStep = "8";
                 // Start pulling down the changes
                 bool allChangesRead = false;
                 do
@@ -140,10 +169,10 @@ namespace SharePoint.WebHooks.Common
                     changeQuery.ChangeTokenStart = lastChangeToken;
 
                     // Execute the change query
-                    var changes = changeList.GetChanges(changeQuery);
+                    var changes = notificationSourceList.GetChanges(changeQuery);
                     cc.Load(changes);
                     cc.ExecuteQueryRetry();
-
+                    notificationStep = "9";
                     if (changes.Count > 0)
                     {
                         foreach (Change change in changes)
@@ -153,7 +182,7 @@ namespace SharePoint.WebHooks.Common
                             if (change is ChangeItem)
                             {
                                 // do "work" with the found change
-                                DoWork(cc, changeList, approvalsList, change, notification);
+                                DoWork(acc, approvalsList, cc, notificationSourceList, change, notification, log);
                             }
                         }
 
@@ -180,6 +209,7 @@ namespace SharePoint.WebHooks.Common
                     {
                         loadedChangeToken.StringValue = lastChangeToken.StringValue;
                         await table.ExecuteAsync(TableOperation.InsertOrReplace(loadedChangeToken));
+                        notificationStep = "10";
                     }
                 }
                 else
@@ -193,6 +223,7 @@ namespace SharePoint.WebHooks.Common
                         StringValue = lastChangeToken.StringValue
                     };
                     await table.ExecuteAsync(TableOperation.InsertOrReplace(newToken));
+                    notificationStep = "11";
                 }
 
                 #endregion
@@ -212,7 +243,7 @@ namespace SharePoint.WebHooks.Common
                             DateTime.Now.AddMonths(3),
                             this.accessToken)
                         ).Result;
-
+                    notificationStep = "12";
                     if (updateResult.Result == false)
                     {
                         throw new Exception(String.Format("The expiration date of web hook {0} with endpoint {1} could not be updated", notification.SubscriptionId, System.Environment.GetEnvironmentVariable("WebHookEndPoint")));
@@ -223,8 +254,8 @@ namespace SharePoint.WebHooks.Common
             catch (Exception ex)
             {
                 // Log error
-                Console.WriteLine(ex.ToString());
-                throw ex;
+                //Console.WriteLine(ex.ToString());
+                throw new Exception("Step " + notificationStep, ex);
             }
             finally
             {
@@ -239,11 +270,14 @@ namespace SharePoint.WebHooks.Common
         /// Method doing actually something with the changes obtained via the web hook notification. 
         /// In this demo we're just logging to a list, in your implementation you do what you need to do :-)
         /// </summary>
-        private static void DoWork(ClientContext cc, List changeList, List historyList, Change change, NotificationModel notification)
+        private static void DoWork(ClientContext approvalCC, List approvalList, ClientContext notificationCC, List notificationSourceList, Change change, NotificationModel notification, TraceWriter log)
         {
-            ListItem li = changeList.GetItemById(((ChangeItem)change).ItemId);
-            cc.Load(li);
-            cc.ExecuteQuery();
+            log.Info("Loading source item with id: " + ((ChangeItem)change).ItemId);
+            log.Info("Notification Source List name:" + notificationSourceList.Title + " " + notificationSourceList.ParentWebUrl);
+            ListItem li = notificationSourceList.GetItemById(((ChangeItem)change).ItemId);
+            notificationCC.Load(li);
+            notificationCC.ExecuteQuery();
+            log.Info("Loaded source item with ID: " + ((ChangeItem)change).ItemId);
             // Only add approval item if in PEnding approval status
             if (li.FieldValues["_ModerationStatus"].ToString() == "2")
             {
@@ -258,17 +292,17 @@ namespace SharePoint.WebHooks.Common
                 camlQuery.ViewXml += $"<Eq><FieldRef Name='ActivityId' /><Value Type='Text'>{changeItem.UniqueId}</Value></Eq>";
                 camlQuery.ViewXml += $"</And></And></Where></Query></View>";
 
-                ListItemCollection matchingItems = historyList.GetItems(camlQuery);
-                cc.Load(matchingItems);
-                cc.ExecuteQuery();
+                ListItemCollection matchingItems = approvalList.GetItems(camlQuery);
+                approvalCC.Load(matchingItems);
+                approvalCC.ExecuteQuery();
 
                 if (matchingItems.Count() == 0)
                 {
                     ListItemCreationInformation newItem = new ListItemCreationInformation();
-                    ListItem item = historyList.AddItem(newItem);
+                    ListItem item = approvalList.AddItem(newItem);
                     var editor = li.FieldValues["Editor"] as FieldUserValue;
 
-                    item["Title"] = string.Format("List {0} had a Change of type \"{1}\" on the item with Id {2}.", changeList.Title, change.ChangeType.ToString(), (change as ChangeItem).ItemId);
+                    item["Title"] = string.Format("List {0} had a Change of type \"{1}\" on the item with Id {2}.", notificationSourceList.Title, change.ChangeType.ToString(), (change as ChangeItem).ItemId);
                     item["ClientState"] = notification.ClientState;
                     item["SubscriptionId"] = notification.SubscriptionId;
                     item["ExpirationDateTime"] = notification.ExpirationDateTime;
@@ -281,7 +315,7 @@ namespace SharePoint.WebHooks.Common
                     item["EditorEmail"] = editor.Email;
                     item["Activity"] = change.ChangeType.ToString();
                     item.Update();
-                    cc.ExecuteQueryRetry();
+                    approvalCC.ExecuteQueryRetry();
                 }
             }
         }

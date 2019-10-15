@@ -1,0 +1,1 @@
+C:\sourcecode\NonClient\CrossSiteApprovals\CrossSiteApprovals\CrossSiteApprovalsFunctionDeployment\obj\Debug\CrossSiteApprovalsFunctionDeployment.deployproj.CoreCompileInputs.cache

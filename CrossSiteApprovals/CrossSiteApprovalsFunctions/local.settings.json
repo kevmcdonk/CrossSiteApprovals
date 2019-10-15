@@ -1,7 +1,12 @@
 {
   "IsEncrypted": false,
   "Values": {
-    
-    "KeyVaultUri": ""
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "",
+    "StorageConnectionString": "UseDevelopmentStorage=true",
+    "ClientId": "",
+    "ClientSecret": "",
+    "TenantName": "",
+    "WebHookEndPoint":  ""
   }
 }
