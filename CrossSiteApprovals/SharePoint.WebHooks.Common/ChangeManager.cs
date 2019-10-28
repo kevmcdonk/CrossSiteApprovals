@@ -66,7 +66,7 @@ namespace SharePoint.WebHooks.Common
                 else
                 {
                     log.Info("App only login");
-                    notificationStep = $"2";
+                    notificationStep = "2";
                     cc = am.GetAppOnlyAuthenticatedContext(url, clientId, clientSecret);
                     acc = am.GetAppOnlyAuthenticatedContext(approvalUrl, clientId, clientSecret);
                     log.Info("App only login token received");
@@ -272,51 +272,58 @@ namespace SharePoint.WebHooks.Common
         /// </summary>
         private static void DoWork(ClientContext approvalCC, List approvalList, ClientContext notificationCC, List notificationSourceList, Change change, NotificationModel notification, TraceWriter log)
         {
-            log.Info("Loading source item with id: " + ((ChangeItem)change).ItemId);
-            log.Info("Notification Source List name:" + notificationSourceList.Title + " " + notificationSourceList.ParentWebUrl);
-            ListItem li = notificationSourceList.GetItemById(((ChangeItem)change).ItemId);
-            notificationCC.Load(li);
-            notificationCC.ExecuteQuery();
-            log.Info("Loaded source item with ID: " + ((ChangeItem)change).ItemId);
-            // Only add approval item if in PEnding approval status
-            if (li.FieldValues["_ModerationStatus"].ToString() == "2")
+            try
             {
-
-                var changeItem = change as ChangeItem;
-
-                CamlQuery camlQuery = new CamlQuery();
-                camlQuery.ViewXml = "<View><Query><Where><And><And>";
-                camlQuery.ViewXml += $"<Eq><FieldRef Name='ClientState' /><Value Type='Text'>{notification.ClientState}</Value></Eq>";
-                camlQuery.ViewXml += $"<Eq><FieldRef Name='Resource' /><Value Type='Text'>{notification.Resource}</Value></Eq></And>";
-                camlQuery.ViewXml += $"<And><Eq><FieldRef Name='ItemId' /><Value Type='Text'>{changeItem.ItemId}</Value></Eq>";
-                camlQuery.ViewXml += $"<Eq><FieldRef Name='ActivityId' /><Value Type='Text'>{changeItem.UniqueId}</Value></Eq>";
-                camlQuery.ViewXml += $"</And></And></Where></Query></View>";
-
-                ListItemCollection matchingItems = approvalList.GetItems(camlQuery);
-                approvalCC.Load(matchingItems);
-                approvalCC.ExecuteQuery();
-
-                if (matchingItems.Count() == 0)
+                log.Info("Loading source item with id: " + ((ChangeItem)change).ItemId);
+                log.Info("Notification Source List name:" + notificationSourceList.Title + " " + notificationSourceList.ParentWebUrl);
+                ListItem li = notificationSourceList.GetItemById(((ChangeItem)change).ItemId);
+                notificationCC.Load(li);
+                notificationCC.ExecuteQuery();
+                log.Info("Loaded source item with ID: " + ((ChangeItem)change).ItemId);
+                // Only add approval item if in PEnding approval status
+                if (li.FieldValues["_ModerationStatus"].ToString() == "2")
                 {
-                    ListItemCreationInformation newItem = new ListItemCreationInformation();
-                    ListItem item = approvalList.AddItem(newItem);
-                    var editor = li.FieldValues["Editor"] as FieldUserValue;
 
-                    item["Title"] = string.Format("List {0} had a Change of type \"{1}\" on the item with Id {2}.", notificationSourceList.Title, change.ChangeType.ToString(), (change as ChangeItem).ItemId);
-                    item["ClientState"] = notification.ClientState;
-                    item["SubscriptionId"] = notification.SubscriptionId;
-                    item["ExpirationDateTime"] = notification.ExpirationDateTime;
-                    item["Resource"] = notification.Resource;
-                    item["TenantId"] = notification.TenantId;
-                    item["SiteUrl"] = notification.SiteUrl;
-                    item["WebId"] = notification.WebId;
-                    item["ItemId"] = changeItem.ItemId;
-                    item["ActivityId"] = changeItem.UniqueId;
-                    item["EditorEmail"] = editor.Email;
-                    item["Activity"] = change.ChangeType.ToString();
-                    item.Update();
-                    approvalCC.ExecuteQueryRetry();
+                    var changeItem = change as ChangeItem;
+
+                    CamlQuery camlQuery = new CamlQuery();
+                    camlQuery.ViewXml = "<View><Query><Where><And><And>";
+                    camlQuery.ViewXml += $"<Eq><FieldRef Name='ClientState' /><Value Type='Text'>{notification.ClientState}</Value></Eq>";
+                    camlQuery.ViewXml += $"<Eq><FieldRef Name='Resource' /><Value Type='Text'>{notification.Resource}</Value></Eq></And>";
+                    camlQuery.ViewXml += $"<And><Eq><FieldRef Name='ItemId' /><Value Type='Text'>{changeItem.ItemId}</Value></Eq>";
+                    camlQuery.ViewXml += $"<Eq><FieldRef Name='ActivityId' /><Value Type='Text'>{changeItem.UniqueId}</Value></Eq>";
+                    camlQuery.ViewXml += $"</And></And></Where></Query></View>";
+
+                    ListItemCollection matchingItems = approvalList.GetItems(camlQuery);
+                    approvalCC.Load(matchingItems);
+                    approvalCC.ExecuteQuery();
+
+                    if (matchingItems.Count() == 0)
+                    {
+                        ListItemCreationInformation newItem = new ListItemCreationInformation();
+                        ListItem item = approvalList.AddItem(newItem);
+                        var editor = li.FieldValues["Editor"] as FieldUserValue;
+
+                        item["Title"] = string.Format("List {0} had a Change of type \"{1}\" on the item with Id {2}.", notificationSourceList.Title, change.ChangeType.ToString(), (change as ChangeItem).ItemId);
+                        item["ClientState"] = notification.ClientState;
+                        item["SubscriptionId"] = notification.SubscriptionId;
+                        item["ExpirationDateTime"] = notification.ExpirationDateTime;
+                        item["Resource"] = notification.Resource;
+                        item["TenantId"] = notification.TenantId;
+                        item["SiteUrl"] = notification.SiteUrl;
+                        item["WebId"] = notification.WebId;
+                        item["ItemId"] = changeItem.ItemId;
+                        item["ActivityId"] = changeItem.UniqueId;
+                        item["EditorEmail"] = editor.Email;
+                        item["Activity"] = change.ChangeType.ToString();
+                        item.Update();
+                        approvalCC.ExecuteQueryRetry();
+                    }
                 }
+            }
+            catch(Exception exp)
+            {
+                log.Error("Unable to log approval: " + exp.Message + ":::" + exp.StackTrace);
             }
         }
 
