@@ -32,7 +32,7 @@ namespace SharePoint.WebHooks.Common.Tests
             };
             
             ChangeManager changeManager = new ChangeManager();
-            await changeManager.ProcessNotification(notification);
+            await changeManager.ProcessNotification(notification, null);
         }
     }
 }

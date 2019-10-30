@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossSiteApprovalsFunctions
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "CrossSiteApprovalsFunctionDeployment", "CrossSiteApprovalsFunctionDeployment\CrossSiteApprovalsFunctionDeployment.deployproj", "{48A924D0-B545-4FE5-B4A9-6E0CA1EE8443}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharePoint.WebHooks.Common.Tests", "SharePoint.WebHooks.Common.Tests\SharePoint.WebHooks.Common.Tests.csproj", "{8841FA0D-2DE2-47F3-8A42-C70D3708304A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{48A924D0-B545-4FE5-B4A9-6E0CA1EE8443}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48A924D0-B545-4FE5-B4A9-6E0CA1EE8443}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48A924D0-B545-4FE5-B4A9-6E0CA1EE8443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8841FA0D-2DE2-47F3-8A42-C70D3708304A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8841FA0D-2DE2-47F3-8A42-C70D3708304A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8841FA0D-2DE2-47F3-8A42-C70D3708304A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8841FA0D-2DE2-47F3-8A42-C70D3708304A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
