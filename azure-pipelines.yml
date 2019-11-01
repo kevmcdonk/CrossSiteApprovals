@@ -25,12 +25,14 @@ steps:
     gulpFile: 'gulpfile.js'
     targets: 'bundle --ship'
     enableCodeCoverage: false
+    workingDirectory: './CrossSiteWebhooks'
 
 - task: Gulp@1
   inputs:
     gulpFile: 'gulpfile.js'
     targets: 'package-solution --ship'
     enableCodeCoverage: false
+    workingDirectory: './CrossSiteWebhooks'
 
 - task: PublishBuildArtifacts@1
   inputs:
