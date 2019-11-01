@@ -25,6 +25,7 @@ steps:
     script: |
       gulp bundle --ship
       gulp package-solution --ship
+    workingDirectory: './CrossSiteWebhooks'
 
 - task: Gulp@1
   inputs:
