@@ -17,10 +17,19 @@ steps:
 
 - script: |
     npm install
-    gulp bundle --ship
-    gulp package-solution --ship
   displayName: 'npm install and build'
   workingDirectory: '.\CrossSiteWebhooks'
+- task: Gulp@1
+  inputs:
+    gulpFile: 'gulpfile.js'
+    targets: 'bundle --ship'
+    enableCodeCoverage: false
+
+- task: Gulp@1
+  inputs:
+    gulpFile: 'gulpfile.js'
+    targets: 'package-solution --ship'
+    enableCodeCoverage: false
 
 - task: PublishBuildArtifacts@1
   inputs:
