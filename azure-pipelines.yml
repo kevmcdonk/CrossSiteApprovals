@@ -20,13 +20,11 @@ steps:
     command: 'install'
     workingDir: './CrossSiteWebhooks'
 
-- task: Gulp@1
+- task: CmdLine@2
   inputs:
-    gulpFile: 'gulpfile.js'
-    targets: 'bundle'
-    arguments: '--ship'
-    enableCodeCoverage: false
-    workingDirectory: './CrossSiteWebhooks'
+    script: |
+      gulp bundle --ship
+      gulp package-solution --ship
 
 - task: Gulp@1
   inputs:
