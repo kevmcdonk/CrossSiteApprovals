@@ -21,3 +21,9 @@ steps:
     gulp package-solution --ship
   displayName: 'npm install and build'
   workingDirectory: '.\CrossSiteWebhooks'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
