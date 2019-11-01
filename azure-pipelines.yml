@@ -19,6 +19,7 @@ steps:
   inputs:
     command: 'install'
     workingDir: './CrossSiteWebhooks'
+  displayName: 'NPM Install'
 
 - task: CmdLine@2
   inputs:
@@ -26,16 +27,11 @@ steps:
       gulp bundle --ship
       gulp package-solution --ship
     workingDirectory: './CrossSiteWebhooks'
-
-- task: Gulp@1
-  inputs:
-    gulpFile: 'gulpfile.js'
-    targets: 'package-solution --ship'
-    enableCodeCoverage: false
-    workingDirectory: './CrossSiteWebhooks'
+  displayName: 'Bundle and Package SPFX webpart'
 
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+  displayName: 'Publish package'
