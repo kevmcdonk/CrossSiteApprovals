@@ -20,4 +20,4 @@ steps:
     gulp bundle --ship
     gulp package-solution --ship
   displayName: 'npm install and build'
-  workingDirectory: 'CrossSiteWebhooks'
+  workingDirectory: '.\CrossSiteWebhooks'
