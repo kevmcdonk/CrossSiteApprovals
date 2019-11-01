@@ -23,7 +23,8 @@ steps:
 - task: Gulp@1
   inputs:
     gulpFile: 'gulpfile.js'
-    targets: 'bundle --ship'
+    targets: 'bundle'
+    arguments: '--ship'
     enableCodeCoverage: false
     workingDirectory: './CrossSiteWebhooks'
 
