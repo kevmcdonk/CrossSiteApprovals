@@ -29,9 +29,5 @@ steps:
     workingDirectory: './CrossSiteWebhooks'
   displayName: 'Bundle and Package SPFX webpart'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'CrossSiteWebhooks'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+
 
