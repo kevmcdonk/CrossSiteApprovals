@@ -30,4 +30,15 @@ steps:
   displayName: 'Bundle and Package SPFX webpart'
 
 
+- task: CopyFiles@2
+  inputs:
+    Contents: '**\*.sppkg'
+    TargetFolder: '$(build.artifactstagingdirectory)/drop'
+  displayName: 'Copy sppkg file to drop folder'
 
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: 'Publish files'
