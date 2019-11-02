@@ -27,7 +27,14 @@ steps:
       gulp bundle --ship
       gulp package-solution --ship
     workingDirectory: './CrossSiteWebhooks'
-  displayName: 'Bundle and Package SPFX webpart'
+  displayName: 'Bundle SPFX webpart'
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      gulp package-solution --ship
+    workingDirectory: './CrossSiteWebhooks'
+  displayName: 'Package SPFX webpart'
 
 
 - task: CopyFiles@2
