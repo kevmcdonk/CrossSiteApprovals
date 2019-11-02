@@ -31,7 +31,7 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'CrossSiteWebhooks/sharepoint'
+    PathtoPublish: 'CrossSiteWebhooks'
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
