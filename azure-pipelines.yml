@@ -31,6 +31,7 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/CrossSiteWebhooks'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
