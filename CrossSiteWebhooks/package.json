@@ -25,7 +25,7 @@
     "react": "16.7.0",
     "react-dom": "16.7.0",
     "sp-pnp-js": "^3.0.10",
-    "moment": "2.19.3"
+    "moment": "2.29.2"
   },
   "resolutions": {
     "@types/react": "16.7.22"
